@@ -1,0 +1,4 @@
+interface:
+  display_name: "Landing Page Composer"
+  short_description: "Generate education landing pages from config JSON"
+  default_prompt: "Use $compose-landing-page to generate an education landing page from user_config_info.json."
