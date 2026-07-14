@@ -35,6 +35,7 @@
 | `booking` | 约课开关 | `true` 表示启用试听课预约链路；`false` 表示仅留资。 |
 | `multiChild` | 多娃开关 | `true` 表示支持继续为其他孩子报名或约课。 |
 | `multiSubject` | 多科开关 | `true` 表示支持配置内科目的拓科选择，禁止新增未配置科目。 |
+| `expandSubjects` | 允许拓科的科目列表 | multiSubject=true 时此字段必填且不可为空；数组结构，存放项目支持拓科的科目。例如"expandSubjects": ["中文", "英文"],|	
 | `maxChildren` | 最多可约孩子数量 | 范围为 1-3；开启多娃时必须遵守。 |
 | `phoneVerify` | 手机号验证功能 | `true` 表示手机号字段需要验证码或验证交互。 |
 | `emailVerify` | 邮箱验证功能 | `true` 表示邮箱字段需要验证码或验证交互。 |
