@@ -1,4 +1,4 @@
 interface:
-  display_name: "Landing Page Composer"
-  short_description: "Generate education landing pages from config JSON"
-  default_prompt: "Use $compose-landing-page to generate an education landing page from user_config_info.json."
+  display_name: "Config-Driven Landing Page"
+  short_description: "Read user_config_info.json + reference docs, then generate a complete, runnable, distinctive landing page HTML"
+  default_prompt: "Use compose-landing-page to turn my user_config_info.json into a distinctive landing page. Read the three reference markdown files (user-config-spec.md, business-rules.md, frontend-design.md) to understand fields, business rules, and design direction before coding."

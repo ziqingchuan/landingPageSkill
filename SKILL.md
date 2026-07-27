@@ -1,95 +1,248 @@
 ---
 name: compose-landing-page
-description: Generate and implement complete education advertising landing pages from user_config_info.json, business rules, and design specifications. Use when the user asks to create a landing page from a JSON configuration table, build a paid-traffic education landing page, implement lead-capture or trial-booking flows, or deliver a previewable, editable, and publishable education campaign website. This skill must produce final page code and a runnable page, not a page plan or blueprint.
+description: Reads a user-uploaded user_config_info.json plus three reference markdown files to generate a complete, runnable, distinctive landing-page HTML. Invoke when the user uploads a JSON config and asks to build/generate/preview a landing page, or references a "config-driven landing page" task.
 ---
 
 # Compose Landing Page
 
-## Purpose
+把一份用户上传的 `user_config_info.json` 配置，转换成业务正确、视觉独特、可直接在浏览器运行的教育类落地页单文件 HTML。整个流程自包含，不依赖任何外部系统（无 PageCraft、无 Impeccable、无 wukong-landing-design）。
 
-Generate conversion-focused education landing pages from `user_config_info.json`. Treat the JSON configuration as the source of truth, enforce business rules before visual decisions, and produce output that can be previewed, edited, and published.
+## 输入
 
-## Required Inputs
+本 Skill 期望用户在对话中提供或上传以下文件：
 
-Before generating or editing a landing page:
+| 文件 | 角色 | 是否必需 |
+| --- | --- | --- |
+| `user_config_info.json` | 当前项目实际配置，决定页面必须支持的字段、功能与科目 | 必需 |
+| `references/user-config-spec.md` | 字段说明书：解释 JSON 每个字段含义、类型、允许值、默认值 | 必需（已内置） |
+| `references/business-rules.md` | 业务护栏：定义字段、转化、预约、多娃多科等行为不变量 | 必需（已内置） |
+| `references/frontend-design.md` | 视觉方向指南：题材取材、字体、布局、视觉母题、反模板判断 | 必需（已内置） |
 
-1. Load the user's `user_config_info.json` or Markdown file containing that JSON.
-2. Read `references/user-config-spec.md` to interpret the schema.
-3. Read `references/business-rules.md` to enforce lead form, booking, multi-child, and multi-subject rules.
-4. Read `references/design-specifications.md` to shape page structure, copy, UI, and responsive behavior.
+三个 `.md` 文件位于 Skill 同级 `references/` 目录，已随项目内置。用户只需提供 `user_config_info.json`（以文件、代码块或 JSON 字符串形式皆可）。
 
-When the user provides an existing page, inspect it before editing and preserve working behavior unless the request requires replacement.
+## 优先级
 
-## Validation
+当来源冲突时，按以下顺序处理：
 
-Run the bundled validator when a JSON configuration file is available:
+**有效配置 → 业务不变量 → 用户明确要求 → Frontend Design 审美方向**
 
-```bash
-python scripts/validate_user_config.py path/to/user_config_info.json
-```
+- 业务规则是护栏，不是页面模板
+- 设计风格可以自由变化，但不得改变业务含义、必填规则、开关结果与数据归属
+- 遇到真实冲突时指出具体字段和规则，不静默猜测
 
-If validation fails, stop and report the blocking errors with the exact fields to fix. If validation returns warnings only, proceed and mention the assumptions used.
+## Workflow
 
-Always enforce these blocking rules even if the script is not run:
+### 第 1 步：获取并理解配置
 
-- Keep at least one enabled contact field: phone or email.
-- Include privacy consent in every lead or booking form.
-- For Chinese courses, require enabled age and level fields.
-- For English or math courses, require an enabled grade field.
-- Require an enabled region field.
-- Keep `maxChildren` between 1 and 3 when multi-child booking is enabled.
-- Render only subjects and fields present in the configuration; do not invent unconfigured subjects.
+1. 读取用户提供的 `user_config_info.json`。如果用户未提供，**停止**并提示需要配置文件才能开始。
+2. 确认 JSON 解析成功；如果解析失败，指出具体错误位置，不猜测修复。
+3. 把配置视为**只读事实**：不生成、不补全、不修复、不重新校验配置。配置的生成与校验由用户侧负责，AI 只消费最终结果。
 
-## Generation Workflow
+### 第 2 步：读取字段说明书
 
-1. Parse and validate the configuration.
-2. Derive the conversion path:
-   - Booking off: lead capture only, no class-time picker.
-   - Booking on: include trial-class booking with date/time selection.
-   - Multi-child on: support additional child flows up to `maxChildren`.
-   - Multi-subject on: support configured subject expansion without inventing subjects.
-3. Select the page structure from the design specifications.
-4. Write parent-facing copy that is clear, concrete, and conversion-oriented.
-5. Build the form and interaction logic from enabled fields and business rules.
-6. Produce or edit the page artifact using the host project's existing framework and style conventions.
-7. Verify responsive layout, CTA visibility, form completeness, and non-overlapping UI.
+完整读取 `references/user-config-spec.md`，目标只有一个：理解每个字段的语义。
 
-## Final Page Implementation Delivery Contract
+- 只理解字段含义，不执行 schema 校验
+- 文档中的示例、默认值和解释不是当前项目数据
+- 特别注意 `enabled` / `required` / `owner` / `locked` / `stage` 等字段的语义
+- 注意 `contactMode`、`flowMode`、`booking`、`multiChild`、`multiSubject` 等开关的组合约束
 
-Always fully implement and deliver the final landing page. Do not stop at an explanatory document, module list, wireframe, CTA strategy, form specification, flow description, or development plan.
+### 第 3 步：建立只读业务模型
 
-The final delivery must include:
+基于配置和字段说明书，在思考中建立当前项目的业务模型：
 
-- Runnable page code in the current project, following the existing framework, routing, component, and styling conventions.
-- A preview route or local development URL.
-- Fully rendered page sections, not only a list of section names.
-- Real clickable CTA buttons in the hero, a mid-page conversion area, and the final conversion area.
-- Form fields from `user_config_info.json`, including required states, field validation, privacy consent, and submit success/failure feedback.
-- Trial-class booking UI when `delivery.booking` is `true`, including date selection, time selection, appointment summary, and result states.
-- Lead-capture flow when `delivery.booking` is `false`, without class-time pickers or controls that only apply to booking scenarios.
-- Multi-child and multi-subject flows when enabled, strictly respecting `maxChildren` and the configured subject scope.
-- Editable data structures or component configuration for copy, campaign content, form fields, and placeholders so operators can revise the page later.
-- Verified responsive behavior for mobile and desktop, including readable text, tappable controls, and non-overlapping layout.
-- A final response that summarizes changed files, preview instructions, validation commands, and unresolved assumptions without treating a page plan as the delivered artifact.
+- 当前项目有哪些科目（`project.subject` + `delivery.extraSubjects`）
+- 哪些字段启用、哪些必填、归属是家长还是孩子
+- 哪些功能开关开启（booking / multiChild / multiSubject / phoneVerify / emailVerify / syncCalendar）
+- 联系方式模式（phone / email / either）和转化流程模式（direct / lead_first）
+- 前置需求单元有哪些（enabled + stage=lead 的字段，加上 leadQuestions）
 
-Use page structure, CTA copy, form rules, trial-booking or lead-capture flow, missing-configuration handling, placeholders, and responsive requirements as implementation inputs that must be reflected directly in the page code. Do not output those items as a standalone explanation and stop.
+不改变字段、枚举、开关、顺序、必填状态和默认值。
 
-## Content Rules
+### 第 4 步：读取业务规则
 
-- Use family-friendly education language for overseas parents.
-- Prioritize "what the child gains" over generic feature claims.
-- Do not fabricate brand numbers, testimonials, teacher credentials, or partner logos. Use editable placeholders when real proof is missing.
-- Keep one primary conversion goal per page.
-- Keep mobile readability and tappable CTAs ahead of decoration.
+完整读取 `references/business-rules.md`，提取必须满足的业务不变量：
 
-## Resource Guide
+- 字段显示、必填、归属和联系方式语义
+- 转化流程状态机：前置需求单元 → 联系方式 → 资料补充 → 约课（仅 booking=true）→ 提交 → 结果页
+- 验证码行为：与当前实际使用的进线字段一对一绑定
+- 预约边界：只有 booking=true 才有真实约课；没有真实时段数据时不得虚构库存
+- 多娃多科循环：每次只提交一个"孩子 + 科目"组合；首次成功后才出现继续入口
+- 隐私、校验、提交、成功、失败和重试行为
+- 真实性边界：不虚构师资、评价、价格、库存
 
-- `references/user-config-spec.md`: schema and field meanings.
-- `references/business-rules.md`: hard conversion and form rules.
-- `references/design-specifications.md`: page strategy, visual rules, copy rules, and final checklist.
-- `scripts/validate_user_config.py`: deterministic configuration validator.
+业务规则定义的是**结果约束**，不是模块清单。AI 根据这些约束自主决定信息架构。
 
+### 第 5 步：形成审美方向
 
+完整读取 `references/frontend-design.md`，按其要求做两阶段设计计划：
 
+**第一阶段：brainstorm**
 
+基于当前科目、受众、主题、投放场景，形成具体审美方向：
 
+- **Color**：4-6 个命名 hex 值构成的调色板
+- **Type**：2+ 角色的字体方案（有性格的 display 字体、互补的 body 字体、可选的 utility 字体）
+- **Layout**：布局概念，用一句话描述 + ASCII 线框图比较多个方向
+- **Signature**：这一个页面会被记住的单一独特元素
+
+**第二阶段：critique**
+
+把第一阶段计划对照 brief 自我批评：
+
+- 如果任何部分读起来像对任何相似页面都会产出的通用默认（暖米色背景 + 衬线 + 赤陶色 / 近黑背景 + 酸性绿 / 报纸式细线 + 零圆角），就修改那部分
+- 明确说出改了什么、为什么改
+- 只在确认设计计划相对独特后，才开始写代码
+- 写代码时严格遵循修订后的计划，每个颜色和字体决定都从计划推导
+
+### 第 6 步：生成页面代码
+
+直接输出完整的、可直接在浏览器打开运行的单文件 HTML：
+
+- `<html>` + `<head>`（含 meta、title、字体引入、内联 `<style>`）+ `<body>` + 内联 `<script>`
+- 不依赖外部构建工具、不依赖 npm 包、不引用本地文件
+- 字体通过 Google Fonts CDN 引入（或系统字体栈）
+- 所有 CSS 内联在 `<style>` 中，注意选择器特异性，避免 `.section` 与 `.cta` 这类基于标签和基于类的选择器互相抵消
+- 所有 JS 内联在 `<script>` 中，实现配置要求的全部业务流程
+
+#### 必须实现的业务行为
+
+根据配置实现以下能力（仅实现配置开启的）：
+
+**转化流程状态机**
+
+- `flowMode=direct`：用户触发主 CTA 后直接进入联系方式页面
+- `flowMode=lead_first`：先逐页完成所有前置需求单元（一页一个单元），再进入联系方式
+- 前置需求单元 = enabled=true 且 stage=lead 的字段（按 fields 顺序）+ 当前流程需要展示的 leadQuestions（按 sortOrder）
+- 当前单元校验通过才能进入下一单元；可返回上一单元修改；前进/后退/校验错误时保留已有有效答案
+- 没有有效前置需求单元时直接进入联系方式，不出现空问题页
+
+**联系方式**
+
+- 根据 `contactMode` 收集：`phone`（仅手机号）/ `email`（仅邮箱）/ `either`（手机号或邮箱任选其一，组合校验"至少填一个"）
+- `either` 不能解释为两者同时必填
+- 切换联系方式时保留用户已输入的内容，只校验当前使用的方式
+
+**验证码**（仅 phoneVerify=true 或 emailVerify=true）
+
+- 验证码与当前实际使用的进线字段一对一绑定
+- `contactMode=phone` 验证手机号，`email` 验证邮箱，`either` 验证用户实际选择的
+- 读取 `delivery.verificationStage`（若配置中存在）决定验证码出现在哪个阶段：`lead` / `contact` / `booking`
+- `verificationStage=lead` 仅在 flowMode=lead_first 时有效；`verificationStage=booking` 仅在 booking=true 时有效
+- 验证码容器使用 `data-verification-stage` 属性标记其阶段
+- 验证成功后才能离开该阶段
+
+**预约**（仅 booking=true）
+
+- 真实预约阶段在联系方式完成后开始
+- 用户必须能提供或选择完成预约所需的信息（日期、时段），并在确认前检查和修改
+- 没有真实时段数据时，使用明确标注的原型数据（如注释或 placeholder 标记 "prototype"），不伪装成真实库存
+- `syncCalendar=true` 时，日历同步只能在预约成功后提供
+- booking=false 时跳过预约，完成剩余必填资料后直接提交
+
+**多娃多科循环**（首次成功后）
+
+- `multiSubject=true`：结果页显示继续选择科目入口，只展示 `project.subject` 与 `extraSubjects` 中仍可处理的科目
+- `multiChild=true` 且孩子总数 < `maxChildren`：提供添加新孩子入口；达到上限后隐藏
+- 已完成的"孩子 + 科目"组合必须标记为已完成或从可选动作中排除
+- `owner=parent` 的数据在后续循环中复用；`owner=child` 的数据归属于具体孩子
+- 换科目后只复用对新科目仍适用的数据；科目条件字段按新组合重新判断
+- 每次只提交一个"孩子 + 科目"组合，不生成笛卡尔积
+- 没有剩余合法组合时，结果页明确说明当前流程已完成
+
+**隐私与提交状态**
+
+- 最终提交前必须获得明确的隐私同意，默认不勾选
+- 提交中防止重复提交，提供可感知反馈
+- 校验失败时不提交无效数据，错误信息定位到具体字段
+- 提交失败时保留用户输入，允许安全重试
+- 成功状态准确说明本次完成的业务动作
+- 隐藏字段、未启用功能和未选择分支的数据不进入提交结果
+
+#### CTA 行为
+
+- CTA 文案必须描述点击后真实发生的动作（留资不写成预约成功，咨询不写成购买完成）
+- CTA 必须连接到可操作的下一状态（聚焦输入、打开流程、进入下一任务、提交数据）
+- CTA 的数量、位置、形式由 AI 根据页面方案自主决定
+
+#### 真实性边界
+
+- 不虚构师资、评价、成绩、排名、奖项、价格、优惠、学员数量、合作品牌、资质或预约库存
+- 缺少事实依据时优先省略相关内容；编辑态占位必须明确标注
+- 可以创作文案、比喻、标题和叙事角度，但不把创意表达包装成未经提供的事实或承诺
+
+#### 响应式与可访问性
+
+- 根据 `delivery.devices` 支持目标终端（`pc` / `mobile`）；两项同时存在时优先保证移动端填写体验
+- 响应式到移动端
+- 可见的键盘焦点
+- 尊重 `prefers-reduced-motion`
+
+### 第 7 步：自检
+
+生成代码后，在交付前对照以下清单自检：
+
+**业务正确性**
+
+- 页面使用的字段、问题、科目和功能均能追溯到实际配置
+- 必填、可选、隐藏、验证和数据归属符合配置
+- `contactMode`、`flowMode`、`booking`、`multiChild`、`multiSubject` 的行为结果正确
+- 前置需求单元逐页完成；没有有效单元时直接进入联系方式，不出现空步骤
+- 每次只提交一个"孩子 + 科目"组合；结果页只提供仍然合法的继续动作
+- 家长级、孩子级和科目条件数据在后续循环中按规则复用，没有重复索取或跨孩子串用
+- CTA 与实际下一动作一致
+- 隐私同意、校验、提交中、成功、失败和重试状态真实可用
+- 页面未虚构事实、承诺或库存
+- 关闭的功能不出现，开启的功能可以完成
+
+**设计质量**
+
+- 设计计划已通过自我批评，不是通用默认模板
+- 字体、颜色、布局都从设计计划推导
+- Signature 元素确实是这一个页面会被记住的单一独特元素
+- 响应式到移动端
+- 键盘焦点可见
+- `prefers-reduced-motion` 被尊重
+- CSS 选择器特异性没有互相抵消
+
+**代码可运行性**
+
+- 单文件 HTML 可直接在浏览器打开运行
+- 不依赖外部构建工具或本地文件
+- 字体通过 CDN 或系统字体栈引入
+- 所有交互在浏览器内可完成（表单提交可 mock 为前端展示，但要明确标注）
+
+### 第 8 步：交付
+
+交付物：单个完整 HTML 文件。
+
+- 在对话中直接展示完整代码（用 ```html 代码块）
+- 同时保存为文件到用户工作目录，文件名基于 `project.name`（如 `中文暑期试听课.html`）
+- 用简短自然语言说明：
+  - 这是什么页面（基于哪个配置生成）
+  - 实现了哪些核心业务能力
+  - 设计方向的 Signature 元素是什么
+  - 哪些数据是原型/占位需要替换
+
+## 决策原则
+
+- 把 `user_config_info.json` 视为唯一项目事实；不生成、不校验、不修复
+- 不添加未配置的字段、科目和功能
+- 不虚构效果、数据、评价、师资、价格、优惠、合作品牌或预约库存
+- 缺少事实型内容时优先省略；编辑态占位必须明确标注
+- 把业务规则理解为结果约束，不把规则列表转换成模块列表
+- 不追求跨项目结构一致；优先让页面方案匹配当前项目的具体目标和内容条件
+- 设计表达可以自由变化，但不得改变业务含义、必填规则、开关结果和数据归属
+- 遇到真实冲突时指出具体字段和规则，不静默猜测
+- 师资、评价、成果、品牌背书、价格、优惠、FAQ、学习路径、流程说明和价值列表均不是无条件必备模块；只有当前页面方案确实需要且内容有依据时才使用
+
+## 失败模式与边界
+
+| 情况 | 处理 |
+| --- | --- |
+| 用户未提供 `user_config_info.json` | 停止，提示需要配置文件 |
+| JSON 解析失败 | 指出错误位置，不猜测修复 |
+| 配置与业务规则存在真实冲突 | 指出具体字段和规则，请用户确认 |
+| 配置缺失可选字段 | 按 `user-config-spec.md` 的默认值理解，不补全到配置中 |
+| 需要真实数据但没有（如预约时段） | 使用明确标注的原型数据，不伪装真实 |
+| 用户要求与配置冲突 | 按"有效配置 → 业务不变量 → 用户明确要求"优先级处理，并向用户说明 |
