@@ -73,10 +73,10 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - 联系方式模式：`phone` / `email` / `either`
 - 转化流程模式：`direct` / `lead_first`
 
-**前置需求单元（按科目区分）**
+**前置需求单元（按科目区分，仅首次流程）**
 
-- 进线科目的前置单元：`fields` 中 `enabled=true` 且 `stage=lead` 的字段（按 fields 顺序）+ `leadQuestions` 配置的问题（按 sortOrder）
-- 拓科科目的前置单元：该科目适用的 lead 阶段字段（按科目硬规则）+ 该科目标准题库中的问题
+- 首次进线流程（第一个孩子 + 进线科目）：`fields` 中 `enabled=true` 且 `stage=lead` 的字段（按 fields 顺序）+ `leadQuestions` 配置的问题（按 sortOrder）
+- 后续拓科拓娃流程：不展示 `leadQuestions`，只展示必要的表单字段（孩子称呼、时区、年龄/水平/年级等）
 
 不改变字段、枚举、开关、顺序、必填状态和默认值。
 
@@ -136,7 +136,8 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 
 - `flowMode=direct`：用户触发主 CTA 后直接进入联系方式页面
 - `flowMode=lead_first`：先逐页完成所有前置需求单元（一页一个单元），再进入联系方式
-- 前置需求单元 = enabled=true 且 stage=lead 的字段（按 fields 顺序）+ 当前流程需要展示的 leadQuestions（按 sortOrder）
+- 前置需求单元 = enabled=true 且 stage=lead 的字段（按 fields 顺序）+ `leadQuestions`（仅首次进线流程，按 sortOrder）
+- **leadQuestions 只在首次进线流程中展示**（第一个孩子 + 进线科目）；后续拓科拓娃不展示，只填必要字段
 - 当前单元校验通过才能进入下一单元；可返回上一单元修改；前进/后退/校验错误时保留已有有效答案
 - 没有有效前置需求单元时直接进入联系方式，不出现空问题页
 
@@ -175,16 +176,25 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - 不适用的科目条件字段不展示、不校验、不提交
 - 字段的 `type`、`stage`、`owner`、`label`、`alias` 等属性在适用时从 `fields` 数组继承
 
-**结果页（总览页）**
+**结果页（双模式）**
 
-- 结果页是整个流程的总览页，展示所有"孩子 + 科目"组合及其状态
-- 总组合数 = 孩子数 × 科目数（进线科目 + 拓科科目）
-- 每个组合显示：科目名称、孩子称呼、当前状态（未开始 / 已完成 / 已预约）
-- 已完成的组合可点击查看详情（预约时间、提交信息等）
-- **只有一个操作按钮**：
-  - `booking=true` 时文案："继续约课"
-  - `booking=false` 时文案："继续报名"
-  - 所有组合均已完成时，按钮置灰或文案变为"全部完成"
+结果页根据 `booking` 开关呈现两种模式：
+
+**`booking=false`（非约课模式）—— 简洁祝贺页**
+
+- 顶部祝贺信息（如"恭喜您！成功报名！"）+ 简要说明
+- 多娃支持提示（仅 multiChild/multiSubject 开启时）
+- 一个操作按钮：**"继续报名其他课程"**（全部完成时置灰或变为"全部完成"）
+- 学习规划师入口（二维码 + 规划师信息卡片）
+- **不展示组合列表，不展示预约详情**
+
+**`booking=true`（约课模式）—— 预约总览页**
+
+- 页面标题如"已预约课程"，展示所有已完成预约的"孩子+科目"组合
+- 每个组合显示：孩子称呼、科目名称、预约详情（时区、日期时间、时长）
+- `syncCalendar=true` 时提供"同步到日历"入口
+- 一个操作按钮：**"继续约课"**（全部完成时置灰或变为"全部完成"）
+- 学习规划师入口（二维码 + 规划师信息卡片）
 
 **购票式多娃多科循环**
 
@@ -214,7 +224,7 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - `owner=parent` 的数据（联系方式、地区、沟通语言）已存在则直接复用并允许修改
 - `owner=child` 的数据（孩子称呼、年龄、水平、年级）该孩子已有则复用并允许修改
 - 科目条件字段按新科目判断适用性（选数学时出现 `grade`，不出现 `level`）
-- 若有前置需求单元（`flowMode=lead_first` 且当前科目有），按一页一题完成
+- 前置需求单元：**首次流程（第一个孩子 + 进线科目）中按一页一题完成；后续拓科拓娃不展示 `leadQuestions`**
 - 验证码仅在 `verificationStage` 对应阶段且尚未验证时出现；已验证的联系方式不重复验证
 - `booking=true` 时选择日期时段完成预约；否则直接提交
 - 提交成功后自动返回结果页，更新该组合状态
@@ -267,7 +277,8 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - `contactMode`、`flowMode`、`booking`、`multiChild`、`multiSubject` 的行为结果正确
 - 前置需求单元逐页完成；没有有效单元时直接进入联系方式，不出现空步骤
 - 每次只提交一个"孩子 + 科目"组合；购票式流程顺序正确（选科目 → 选孩子 → 完成预约/报名）
-- 结果页展示所有"孩子 + 科目"组合的状态总览，且只有一个操作按钮（继续约课/继续报名）
+- **`booking=false` 时结果页为简洁祝贺页**（祝贺 + 规划师入口 + 继续报名按钮），不展示组合列表
+- **`booking=true` 时结果页为预约总览页**，展示所有已完成预约的组合及其预约详情
 - 科目选择页显示每个科目的完成进度；全部完成的科目置灰不可选
 - 孩子选择页支持选择已有孩子和添加新孩子；不允许重名；已完成该科目的孩子不可重复选
 - 拓科科目的字段按科目条件规则重新判断（如数学/英文必须有 `grade`，中文必须有 `level`）
