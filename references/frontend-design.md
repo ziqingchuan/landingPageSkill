@@ -1,54 +1,234 @@
 ---
 name: frontend-design
-description: Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don't read as templated defaults.
+description: 悟空中文教育类落地页的视觉与内容设计规范。在遵守业务规则与配置的前提下，指导 AI 做出温暖、可信、有独特观点的转化页面设计，避免套用通用模板。
 ---
 
-# Frontend Design
+# 前端设计规范
 
-Approach this as the design lead at a small studio known for giving every client a visual identity that could not be mistaken for anyone else's. This client has already rejected proposals that felt templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take one real aesthetic risk you can justify.
+这份规范用于指导 AI 在第三方产品中生成悟空中文的教育类落地页。
 
-## Ground it in the subject
+目标不是做一个"好看的网站"，而是做一个"家长能看懂、愿意信、愿意点"的转化页面。
 
-If the brief does not pin down what the product or subject is, pin it yourself before designing: name one concrete subject, its audience, and the page's single job, and state your choice. If there's any information in your memory about the human's preferences, context about what they're building, or designs you've made before – use that as a hint. The subject's own world, its materials, instruments, artifacts, and vernacular, is where distinctive choices come from. Build with the brief's real content and subject matter throughout.
+## 文档定位
 
-## Design principles
+本文件是视觉方向、内容表达、可用性、响应式与可访问性的指南，不是页面模板，也不定义业务不变量。
 
-For web designs, the hero is a thesis. Open with the most characteristic thing in the subject's world, in whatever form makes sense for it: a headline, an image, an animation, a live demo, an interactive moment. Be deliberate with your choice: a big number with a small label, supporting stats, and a gradient accent is the template answer, only use if that's truly the best option.
+- 业务行为、字段语义、功能开关结果由 `business-rules.md` 和 `user-config-spec.md` 定义，优先级高于本文件。
+- `user_config_info.json` 是唯一项目事实，决定实际有哪些科目、字段和功能。
+- 本文件给出的页面结构、模块方向和文案建议是"内容方向"，不是"必现模块清单"。只有当内容有依据、且服务于转化目标时才使用对应模块；不得为了凑结构而堆模块（与 `business-rules.md` 第 12 节一致）。
+- 遇到冲突时按 **有效配置 → 业务规则 → 用户明确要求 → 本文件审美方向** 处理。
 
-Typography carries the personality of the page. Pair the display and body faces deliberately, not the same families you would reach for on any other project, and set a clear type scale with intentional weights, widths, and spacing. Make the type treatment itself a memorable part of the design, not a neutral delivery vehicle for the content.
+## 1. 适用范围
 
-Structure is information. Structural devices, numbering, eyebrows, dividers, labels, should encode something true about the content, not decorate it. Many generic designs use numbered markers (01 / 02 / 03), but that's only appropriate if the content actually is a sequence - like a real process or a typed timeline where order carries information the reader needs. Question if choices like numbered markers actually make sense before incorporating them.
+- 适用于悟空中文的课程介绍页、免费试听页、留资页、预约页。
+- 适用于海外华裔家庭、中文启蒙、中文提升、中文分级学习等场景。
+- 默认核心目标是免费试听、留资咨询或预约体验课。
 
-Leverage motion deliberately. Think about where and if animation can serve the subject: a page-load sequence, a scroll-triggered reveal, hover micro-interactions, ambient atmosphere. An orchestrated moment usually lands harder than scattered effects; choose what the direction calls for. However, sometimes less is more, and extra animation contributes to the feeling that the design is AI-generated.
+## 2. 品牌定位
 
-Match complexity to the vision. Maximalist directions need elaborate execution; minimal directions need precision in spacing, type, and detail. Elegance is executing the chosen vision well.
+- 品牌表达要温暖、可靠、专业，不要像游戏化工具，也不要像纯招生广告。
+- 页面气质要体现"中文学习""儿童教育""海外家庭""长期陪伴"。
+- 视觉上要有教育感和信任感，避免太多炫酷动效、花哨渐变和过度科技感。
+- 文案要简单清楚，尽量让家长一眼明白"适合谁、解决什么、下一步做什么"。
 
-Consider written content carefully. Often a design brief may not contain real content, and it's up to you to come up with copy. Copy can make a design feel as templated as the design itself. See the below section on writing for more guidance.
+## 3. 核心受众
 
-## Process: brainstorm, explore, plan, critique, build, critique again
+- 主要受众是海外华裔家庭的家长，孩子年龄大致在 3-18 岁。
+- 家长最关心的是：孩子是否适合、学什么、多久见效、老师靠不靠谱、有没有试听。
+- 低龄家长更关注启蒙、兴趣、互动和基础表达。
+- 高龄家长更关注阅读、写作、系统提升和考试或能力衔接。
 
-For calibration: AI-generated design right now clusters around three looks: (1) a warm cream background (near #F4F1EA) with a high-contrast serif display and a terracotta accent; (2) a near-black background with a single bright acid-green or vermilion accent; (3) a broadsheet-style layout with hairline rules, zero border-radius, and dense newspaper-like columns. All three are legitimate for some briefs, but they are defaults rather than choices, and they appear regardless of subject. Where the brief pins down a visual direction, follow it exactly — the brief's own words always win, including when it asks for one of these looks. Where it leaves an axis free, don't spend that freedom on one of these defaults. Just like a human designer who's hired, there's often a careful balance between doing what you're good at and taking each project as a chance to experiment and learn.
+## 4. 页面目标
 
-Work in two passes. First, brainstorm a short design plan based on the human's design brief: create a compact token system with color, type, layout, and signature. Color: describe the palette as 4–6 named hex values. Type: the typefaces for 2+ roles (a characterful display face that's used with restraint, a complementary body face, and a utility face for captions or data if needed). Layout: a layout concept, using one-sentence prose descriptions and ASCII wireframes to ideate and compare. Signature: the single unique element this page will be remembered by that embodies the brief in an appropriate way.
+- 让访问者在 3 秒内看懂这是做什么的。
+- 让访问者在首屏就知道为什么选择悟空中文。
+- 让访问者在浏览过程中逐步建立信任。
+- 让访问者在关键位置自然点击 CTA。
 
-Then review that plan against the brief before building: if any part of it reads like the generic default you would produce for any similar page (work through a similar prompt to see if you arrive somewhere similar) rather than a choice made for this specific brief — revise that part, say what you changed and why. Only after you've confirmed the relative uniqueness of your design plan should you start to write the code, following the revised plan exactly and deriving every color and type decision from it.
+## 5. 设计原则
 
-When writing the code, be careful of structuring your CSS selector specificities. It's easy to generate CSS classes that cancel each other out (especially with a type-based selector like .section and a element-based selector like .cta). This can happen often with paddings/margins between sections.
+把每一个落地页当作一个有观点的设计提案：为这个具体投放场景做出明确的调色、字体和布局选择，而不是套用任何页面都会出现的默认样式。
 
-Try to do a lot of this planning and iteration in your thinking, and only show ideas to the user when you have higher confidence it'll delight them.
+**首屏是一个论点。** 用科目世界里最有代表性的东西开场：一句结果导向的标题、一张孩子学习或老师授课的画面、一个可信信号。不要用"大数字 + 小标签 + 渐变点缀"这种模板答案，除非它真的是这个场景的最优解。
 
-## Restraint and self-critique
+**字体承载个性。** 刻意搭配展示字体与正文字体，建立清晰的字号层级、字重和字距。让字体本身成为设计记忆点，而不是中性的内容载体。中文页面优先使用清晰、亲和的字体；海外华裔场景注意中英混排的可读性。
 
-Spend your boldness in one place. Let the signature element be the one memorable thing, keep everything around it quiet and disciplined, and cut any decoration that does not serve the brief. Not taking a risk can be a risk itself! Build to a quality floor without announcing it: responsive down to mobile, visible keyboard focus, reduced motion respected. Critique your own work as you build, taking screenshots if your environment supports it – a picture is worth 1000 tokens. Consider Chanel's advice: before leaving the house, take a look in the mirror and remove one accessory. Human creators have memory and always try to do something new, so if you have a space to quickly jot down notes about what you've tried, it can help you in future passes.
+**结构即信息。** 编号、眉标、分隔线、标签应承载关于内容的真实含义，而不是装饰。只有当内容本身就是有序流程或时间线时，才使用 01/02/03 这类编号标记；用之前先确认它是否真的必要。
 
-## More on writing in design
+**克制使用动效。** 动效要服务于内容和信任，而不是炫技。一次精心编排的入场或滚动揭示，比满屏零散效果更有力。教育场景里，过度动效反而会削弱可信度，让人感觉是 AI 生成的。
 
-Words appear in a design for one reason: to make it easier to understand, and therefore easier to use. They are design material, not decoration. Bring the same intentionality to copy that you would bring to spacing and color. Before writing anything, ask what the design needs to say, and how it can best be said to help the person navigate the experience.
+**复杂度匹配愿景。** 温暖可信的方向需要克制的执行——精准的留白、清晰的层级、到位的细节；不要为了"高级感"堆叠复杂结构。
 
-Write from the end user's side of the screen. Name things by what people control and recognize, never by how the system is built. A person manages notifications, not webhook config. Describe what something does in plain terms rather than selling it. Being specific is always better than being clever.
+## 6. 视觉规范
 
-Use active voice as default. A control should say exactly what happens when it's used: "Save changes," not "Submit." An action keeps the same name through the whole flow, so the button that says "Publish" produces a toast that says "Published." The vocabulary of an interface is the signposting for someone navigating the product. Cohesion and consistency are how people learn their way around.
+- 整体风格要简洁、可信、温暖。
+- 颜色以品牌主色为主，辅助色少量点缀；建议 4-6 个命名色值构成的调色板，避免花哨渐变。
+- 卡片、留白、圆角可以使用，但不能太像通用 SaaS 模板。
+- 图片和插图优先展示孩子学习、老师授课、家庭场景、成果表达等真实教育场景。
+- 不能为了"高级感"牺牲可读性。
+- 移动端按钮必须够大，文本不能太密。
 
-Treat failure and emptiness as moments for direction, not mood. Explain what went wrong and how to fix it, in the interface's voice rather than a person's. Errors don't apologize, and they are never vague about what happened. An empty screen is an invitation to act.
+### 反模板校准
 
-Keep the register conversational and tuned: plain verbs, sentence case, no filler, with tone matched to the brand and the audience. Let each element do exactly one job. A label labels, an example demonstrates, and nothing quietly does double duty.
+当前 AI 生成设计容易扎堆三种默认外观：(1) 暖米色背景（近 #F4F1EA）+ 高对比衬线 + 赤陶色点缀；(2) 近黑背景 + 单一酸性绿或朱红点缀；(3) 报纸式细线 + 零圆角 + 密集分栏。这三种对某些场景都合法，但它们是"默认"而非"选择"，会出现在任何题材上。
+
+对教育落地页，第一种（暖米色 + 衬线 + 赤陶）最容易被当作"温暖可信"的捷径而直接套用——这恰恰是最需要警惕的默认。如果投放场景确实指向温暖方向，可以用暖色调，但必须做出具体到这个项目的选择（具体的色值、具体的字体配对、具体的视觉母题），而不是复刻默认外观。把审美自由度花在题材本身，而不是花在某一种默认上。
+
+## 7. 题材取材
+
+设计独特性来自科目自身的世界。中文教育的世界里可用的视觉材料：
+
+- **书写与汉字**：笔顺、田字格、墨色与纸感——但不要过度中国风化到刻板。
+- **孩子的学习过程**：开口表达、朗读、写字、互动课堂。
+- **老师与教研**：授课场景、教师形象、备课与教研氛围。
+- **家庭场景**：海外华裔家庭亲子共读、日常中文交流。
+- **成长与成果**：从不敢说到敢说、从识字到阅读的进阶。
+
+从中提炼一个视觉母题（Signature）：这个页面会被记住的单一独特元素。它应该贴合投放场景与主题，而不是为独特而独特。
+
+## 8. 页面结构与模块方向
+
+推荐的内容组织方向（仅当内容有依据时使用，非强制模板）：
+
+1. 首屏 Hero
+2. 信任背书
+3. 价值主张
+4. 课程体系或学习路径
+5. 老师或教研实力
+6. 学员成果或家长评价
+7. 常见问题
+8. 留资或预约表单
+
+如果页面很短，至少保留：首屏 Hero、课程价值、信任背书、CTA 表单。
+
+> 模块取舍原则：师资、评价、成果、品牌背书、价格、FAQ、学习路径、流程说明和价值列表都不是无条件必备模块。只有当前页面方案确实需要、且内容有依据时才使用。不得为了凑满上述结构而堆砌空模块。模块数量、顺序、篇幅由 AI 根据实际配置和内容自主决定（与 `business-rules.md` 第 12 节一致）。
+
+## 9. 首屏规范
+
+- 标题必须是结果导向，不要只写"欢迎来到悟空中文"。
+- 副标题要补充目标人群、课程特点和学习收益。
+- 主 CTA 必须醒目，建议用"免费试听""立即预约""领取测评""咨询课程"。
+- 首屏最好同时出现一个可信信号，例如学员数、老师资质、课程年限、家长口碑。
+- 首屏不要塞太多信息，重点只保留一个主诉求。
+
+推荐首屏表达方向：
+
+- 让孩子敢说中文、会表达、能持续进步。
+- 为海外华裔孩子提供系统化中文学习路径。
+- 从启蒙到提升，帮助孩子建立中文基础能力。
+
+## 10. 信任背书
+
+- 必须包含至少两类信任信号。
+- 可用的信任信号包括：家长评价、学员成果、教师资质、课程体系、品牌数据、合作机构、媒体或平台背书。
+- 评价内容要具体，尽量带结果，不要只有"很好""不错"。
+- 如果没有真实数据，不允许编造，应该使用"可补充占位位"并明确标注。
+- 信任模块应该放在首屏后面，或者在首屏中直接露出一部分。
+
+## 11. 价值主张
+
+- 价值主张要回答一个问题：为什么是悟空中文，而不是别的中文课。
+- 内容重点应该放在结果和收益上，不要只讲功能。
+- 要围绕家长最在意的问题组织内容：孩子适不适合、怎么学、多久见效果、是否坚持得住。
+- 推荐强调的方向：系统化中文学习路径、海外家庭友好的教学方式、分龄或分级教学、听说读写能力提升、有趣可坚持可见进步。
+
+## 12. CTA 规范
+
+- CTA 文案要动作明确，不要用空泛按钮词。
+- 建议在首屏、价值主张之后、页面底部等关键位置提供 CTA 入口；但具体数量和位置由页面方案自主决定，不要机械地在每个模块重复 CTA（与 `business-rules.md` 第 5、12 节一致）。
+- CTA 文案要保持一致，不要每个模块都换一个完全不同的说法。
+- 推荐 CTA 文案：免费试听、立即预约、领取测评、咨询课程、获取学习方案。
+- CTA 文案必须描述点击后真实发生的动作，与配置的转化目标一致；不得把留资写成预约成功，也不得把咨询写成购买完成。
+
+## 13. 表单规范
+
+- 联系方式按 `contactMode` 收集，确保至少一条可联系途径。
+- 字段适用性由配置和科目条件规则决定：中文课程年龄和水平必须出现，数学或英文课程年级必须出现（详见 `user-config-spec.md` 第五节、`business-rules.md` 第 6.2 节）。
+- 隐私同意必须清楚可见，不能藏在很深的位置；默认不勾选。
+- 表单字段越少越好，只保留真正影响跟进的字段。
+- 如果页面包含预约课时（`booking=true`），则日期、时间、预约说明要清楚，不要让家长猜；没有真实时段数据时不得虚构库存。
+
+## 14. 文案规范
+
+- 用家长听得懂的话，不要堆太多教育术语。
+- 标题尽量具体，不要写"欢迎""解决方案""全面提升"这类空话。
+- 尽量写结果，比如"让孩子敢开口说中文"，而不是"提供丰富课程内容"。
+- 尽量写具体对象，比如"海外华裔 3-18 岁孩子"，而不是"所有学生"。
+- 评价、成果、数据要具体，能量化就不要只说感受。
+- 文案从家长视角出发：用家长能控制、能识别的词命名事物，而不是用系统内部的叫法。控件文案应说明点击后真实发生的事，且整个流程中保持一致（如按钮"提交"成功后提示"已提交"）。
+
+## 15. 交互规范
+
+- 页面默认要能先看后点，不能强依赖后端返回才有下一步。
+- 如果某个模块数据缺失，应该显示占位内容或默认建议，而不是整个页面中断。
+- 任何关键操作都要有清晰的成功、失败和重试提示。
+- 如果是多轮修改页面，建议每次只改一个重点，避免整页重写。
+- 不要让用户在一个页面里频繁切换复杂状态。
+- 错误信息要能定位到具体字段或具体业务条件，说明问题并给出修复方向，不要含糊道歉。
+
+## 16. 速度与适配
+
+- 首屏内容必须优先加载。
+- 图片要压缩，视频要谨慎使用。
+- 页面必须优先适配手机（`devices` 含 `mobile` 时优先保证移动端填写体验）。
+- 重要内容不能依赖放大缩小才能阅读。
+- 页面速度优先级高于装饰效果。
+- 可见的键盘焦点，尊重 `prefers-reduced-motion`。
+
+## 17. 设计流程：brainstorm → critique → build
+
+**第一阶段：brainstorm。** 基于当前科目、受众、投放场景和主题，形成一个紧凑的设计计划：
+
+- **Color**：4-6 个命名 hex 值构成的调色板。
+- **Type**：2+ 角色的字体方案（有性格的展示字体、互补的正文字体、可选的工具字体用于说明或数据）。
+- **Layout**：布局概念，用一句话描述 + ASCII 线框图比较多个方向。
+- **Signature**：这一个页面会被记住的单一独特元素。
+
+**第二阶段：critique。** 把第一阶段计划对照投放场景与主题自我批评：
+
+- 如果任何部分读起来像对任何相似页面都会产出的通用默认（暖米色 + 衬线 + 赤陶 / 近黑 + 酸性绿 / 报纸式细线 + 零圆角），就修改那部分。
+- 明确说出改了什么、为什么改。
+- 只在确认设计计划相对独特后，才开始写代码。
+- 写代码时严格遵循修订后的计划，每个颜色和字体决定都从计划推导。
+- 注意 CSS 选择器特异性，避免 `.section`（类选择器）与 `.cta` 这类选择器互相抵消，尤其在段落间距上。
+
+尽量在思考中完成大部分规划与迭代，只在有较高把握能让用户惊喜时才展示方案。
+
+## 18. 克制与自检
+
+把大胆集中在一处。让 Signature 元素成为唯一的记忆点，它周围的一切保持安静和克制，砍掉所有不服务于转化目标的装饰。但"不冒险"本身也是一种风险——刻意避开所有熟悉做法，可能让页面失去对家长的亲和力。教育场景需要在"可信亲和"和"有独特观点"之间取得平衡。
+
+达到质量底线但不张扬：响应式到移动端、可见的键盘焦点、尊重 reduced motion。边做边自我批评，能截图就截图——一张图值 1000 个 token。参考香奈儿的建议：出门前照照镜子，摘掉一件配饰。
+
+## 19. 常见错误
+
+- 首屏太泛，用户不知道你在卖什么。
+- 模块太多，但没有重点。
+- 只有宣传，没有证据。
+- CTA 太弱，用户找不到下一步。
+- 表单字段太多，家长不愿填写。
+- 视觉很热闹，但不可信。
+- 移动端排版崩坏。
+- 套用通用 AI 默认外观，没有针对教育场景做出具体选择。
+
+## 20. AI 生成要求
+
+- AI 生成页面时，必须先遵守业务规则，再做视觉优化。
+- AI 不要把技术实现当成目标，重点是页面结构和转化逻辑。
+- AI 生成内容要保留可修改性，方便运营多轮调整。
+- 如果信息不足，先输出默认结构和缺失项，不要自行编造真实数据。
+- 把业务规则理解为结果约束，不把规则列表转换成模块清单。
+
+## 21. 最终检查清单
+
+- 3 秒内能看懂这页是做什么的。
+- 页面有清楚的主 CTA。
+- 页面有信任背书。
+- 页面能说明课程价值。
+- 页面包含必要表单字段（且与配置一致）。
+- 移动端可读、可点、可提交。
+- 文案不空泛，不夸张，不像模板套话。
+- 设计计划已通过自我批评，不是通用默认模板。
+- 字体、颜色、布局都从设计计划推导。
+- Signature 元素确实是这一个页面会被记住的单一独特元素。
+- 页面未虚构事实、承诺或库存。
