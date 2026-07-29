@@ -47,7 +47,7 @@
 | `syncCalendar` | `boolean` | 否 | 默认 `false` | 是否在完成约课后提供日历同步。仅在 `booking=true` 时生效。 |
 | `phoneVerify` | `boolean` | 否 | 默认 `false` | 是否对已展示的手机号字段提供验证码/验证交互。 |
 | `emailVerify` | `boolean` | 否 | 默认 `false` | 是否对已展示的邮箱字段提供验证码/验证交互。 |
-| `verificationStage` | `string` | 否 | `lead`、`contact`、`booking`；默认 `contact` | 验证码出现的流程阶段。`lead` 仅在 `flowMode=lead_first` 时有效；`booking` 仅在 `booking=true` 时有效。详见 `business-rules.md` 第 7.4 节。 |
+| `verificationStage` | `string` | 否 | `lead`、`contact`、`booking`；默认 `contact` | 验证码出现的流程阶段。`lead` 仅在 `flowMode=lead_first` 时有效；`booking` 仅在 `booking=true` 时有效。详见 `business-rules.md` 第 8.4 节。 |
 
 ### 联系方式规则
 
