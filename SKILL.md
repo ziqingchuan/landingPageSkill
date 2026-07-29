@@ -158,6 +158,13 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - 可见的键盘焦点
 - 尊重 `prefers-reduced-motion`
 
+#### 图片素材策略
+
+- 装饰性元素（图标、背景图形、装饰性插画）优先使用内联 SVG，确保单文件自包含和无限缩放
+- 照片级素材（场景图、人物图、教学环境）使用免费 CDN 图库直链（如 Unsplash、Pexels），确保视觉品质和真实感
+- 不使用本地文件路径，不依赖外部构建工具或文件系统
+- 图片必须添加明确的尺寸约束，避免布局抖动
+
 ### 第 7 步：自检
 
 生成代码后，在交付前对照以下清单自检：
