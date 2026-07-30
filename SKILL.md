@@ -1,11 +1,13 @@
 ---
 name: compose-landing-page
-description: Reads a user-uploaded user_config_info.json plus three reference markdown files to generate a complete, runnable, distinctive landing-page HTML. Invoke when the user uploads a JSON config and asks to build/generate/preview a landing page, or references a "config-driven landing page" task.
+description: Reads a user-uploaded user_config_info.json plus three reference markdown files and a question bank to generate a complete, runnable, distinctive landing-page HTML. Invoke when the user uploads a JSON config and asks to build/generate/preview a landing page, or references a "config-driven landing page" task.
 ---
 
 # Compose Landing Page
 
 把一份用户上传的 `user_config_info.json` 配置，转换成业务正确、视觉独特、可直接在浏览器运行的教育类落地页单文件 HTML。整个流程自包含，不依赖任何外部系统（无 PageCraft、无 Impeccable、无 wukong-landing-design）。
+
+当前配置契约版本：**3.0**，核心变化为 `conversionFlow` 统一描述转化流程。
 
 ## 输入
 
@@ -17,8 +19,9 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 | `references/user-config-spec.md` | 字段说明书：解释 JSON 每个字段含义、类型、允许值、默认值 | 必需（已内置） |
 | `references/business-rules.md` | 业务护栏：定义字段、转化、预约、多娃多科等行为不变量 | 必需（已内置） |
 | `references/frontend-design.md` | 视觉方向指南：题材取材、字体、布局、视觉母题、反模板判断 | 必需（已内置） |
+| `references/question-bank.json` | 标准题库表：题目正文、选项、科目和分类映射 | 必需（已内置） |
 
-三个 `.md` 文件位于 Skill 同级 `references/` 目录，已随项目内置。用户只需提供 `user_config_info.json`（以文件、代码块或 JSON 字符串形式皆可）。
+三个 `.md` 文件和 `question-bank.json` 位于 Skill 同级 `references/` 目录，已随项目内置。用户只需提供 `user_config_info.json`（以文件、代码块或 JSON 字符串形式皆可）。
 
 ## 优先级
 
@@ -28,6 +31,7 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 
 - 业务规则是护栏，不是页面模板
 - 设计风格可以自由变化，但不得改变业务含义、必填规则、开关结果与数据归属
+- **`conversionFlow` 是转化流程的唯一事实来源**：阶段顺序和节点顺序都由它决定
 - 遇到真实冲突时指出具体字段和规则，不静默猜测
 
 ## Workflow
@@ -41,11 +45,13 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 
 ### 第 2 步：读取字段说明书
 
-完整读取 `references/user-config-spec.md`，目标只有一个：理解每个字段的语义。
+完整读取 `references/user-config-spec.md`，目标只有一个：理解每个字段的语义，重点是 `conversionFlow` 的结构。
 
 - 只理解字段含义，不执行 schema 校验
 - 文档中的示例、默认值和解释不是当前项目数据
-- 特别注意 `enabled` / `required` / `owner` / `locked` / `stage` 等字段的语义
+- 特别注意 `conversionFlow` 的两层数组顺序（阶段顺序 + 节点顺序）
+- 理解 5 种 item 类型：`field`、`question`、`verification`、`booking`、`calendarSync`
+- 注意 `submit` 和 `result` 不是配置项，而是 `complete` 阶段的固有行为，始终存在
 - 注意 `contactMode`、`flowMode`、`booking`、`multiChild`、`multiSubject` 等开关的组合约束
 
 ### 第 3 步：建立只读业务模型
@@ -58,26 +64,55 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 - 拓科科目：`delivery.extraSubjects`（追加流程中可选的其他科目）
 - 所有科目：进线科目 + 拓科科目
 
+**转化流程（核心）**
+
+`conversionFlow` 是转化流程的唯一事实来源，包含两层顺序：
+
+1. **阶段顺序**：`conversionFlow` 数组中各阶段的先后顺序（如 lead → contact → booking → complete）
+2. **节点顺序**：每个阶段内 `items` 数组中各节点的先后顺序
+
+AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
+
+阶段类型：
+- `lead`：前置需求阶段（field + question 节点）
+- `contact`：联系方式阶段（field + verification 节点）
+- `booking`：预约阶段（field + booking 节点）
+- `complete`：完成阶段（calendarSync 节点 + 固有的提交和结果展示）
+
 **字段体系（按科目划分）**
 
 - 通用字段（所有科目均适用）：`childName`、`phone`、`email`、`region`、`commLang`
 - 科目条件字段（仅特定科目适用）：
-  - `age`：中文必须启用/必填/锁定；数学、英文不强制
-  - `level`（中文水平）：仅中文适用，必须启用/必填/锁定
-  - `grade`（年级）：数学、英文必须启用/必填/锁定；中文不强制
-- `fields` 数组描述的是进线科目的字段配置；拓科科目按科目硬规则重新判断，不直接沿用 `fields` 的 `enabled`/`required`/`locked`
+  - `age`：中文必须启用/必填；数学、英文不强制
+  - `level`（中文水平）：仅中文适用，必须启用/必填
+  - `grade`（年级）：数学、英文必须启用/必填；中文不强制
+- `conversionFlow` 描述的是进线科目的流程；拓科科目按科目硬规则重新判断字段适用性，阶段结构和功能节点保持不变
 
 **功能开关**
 
-- 全局开关（所有科目共用）：`booking` / `multiChild` / `multiSubject` / `phoneVerify` / `emailVerify` / `syncCalendar` / `verificationStage`
+- 全局开关（所有科目共用）：`booking` / `multiChild` / `multiSubject` / `syncCalendar`
 - `maxChildren`：最大孩子数量（`multiChild=false` 时为 1）
 - 联系方式模式：`phone` / `email` / `either`
-- 转化流程模式：`direct` / `lead_first`
+- 转化流程模式：`direct` / `lead_first`（与 `conversionFlow` 是否包含 `lead` 阶段一致）
+- 验证码：通过 `conversionFlow` 中是否包含 `verification` 节点决定，节点所在阶段即验证码出现位置
 
 **前置需求单元（按科目区分，仅首次流程）**
 
-- 首次进线流程（第一个孩子 + 进线科目）：`fields` 中 `enabled=true` 且 `stage=lead` 的字段（按 fields 顺序）+ `leadQuestions` 配置的问题（按 sortOrder）
-- 后续拓科拓娃流程：不展示 `leadQuestions`，只展示必要的表单字段（孩子称呼、时区、年龄/水平/年级等）
+- 首次进线流程（第一个孩子 + 进线科目）：`conversionFlow` 的 `lead` 阶段中所有 field 和 question 节点（按 items 顺序）
+- 后续拓科拓娃流程：不展示前置问题，只展示必要的表单字段（孩子称呼、时区、年龄/水平/年级等）
+
+**读取标准题库**
+
+在生成前置需求单元的问题时，必须读取 `references/question-bank.json`，根据 `conversionFlow` 中 `kind=question` 节点的 `questionId` 匹配题库中的完整题目内容：
+
+- 题库中每道题包含中英双语文案（`questionText`/`questionTextEn`、`text`/`textEn`）
+- 根据 `project.language` 选择对应语言：
+  - `简体中文` → 使用 `questionText` 和 `text`
+  - `English` → 使用 `questionTextEn` 和 `textEn`
+- 选项的 `optionId` 是中英双语的稳定标识符，提交数据始终使用 `optionId`，与页面展示语言无关
+- 如果 `conversionFlow` 配置了题库中不存在的 `questionId`，应指出具体 ID，不静默跳过
+- 题库中的题目按 `questionId` 索引，同时记录科目（`subject`）和分类（`category`），用于校验配置与题目的匹配性
+- 题库只包含题目内容，不决定题目是否展示；展示与否由 `conversionFlow` 和 `flowMode` 业务规则决定
 
 不改变字段、枚举、开关、顺序、必填状态和默认值。
 
@@ -86,11 +121,11 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 完整读取 `references/business-rules.md`，提取必须满足的业务不变量：
 
 - 字段显示、必填、归属和联系方式语义
-- 科目条件字段规则：进线科目用 `fields` 配置，拓科科目按科目硬规则重新判断
-- 转化流程状态机：前置需求单元 → 联系方式 → 资料补充 → 约课（仅 booking=true）→ 提交 → 结果页
-- 验证码行为：与当前实际使用的进线字段一对一绑定
+- 科目条件字段规则：进线科目用 `conversionFlow` 配置，拓科科目按科目硬规则重新判断
+- 转化流程状态机：阶段顺序和节点顺序严格遵循 `conversionFlow`
+- 验证码行为：出现在 `verification` 节点所在阶段，与当前实际使用的进线字段一对一绑定
 - 预约边界：只有 booking=true 才有真实约课；每个"孩子+科目"组合独立预约
-- **购票式多娃多科循环**：结果页（总览所有组合）→ 选科目 → 选孩子 → 资料补充 → 预约 → 提交 → 返回结果页
+- **购票式多娃多科循环**：结果页（总览所有组合）→ 选科目 → 选孩子 → 按 conversionFlow 完成 → 返回结果页
 - 结果页：根据 booking 模式呈现（简洁祝贺页或预约总览页），只有一个操作按钮（继续约课/继续报名）
 - 隐私、校验、提交、成功、失败和重试行为
 - 真实性边界：不虚构师资、评价、价格、库存
@@ -135,17 +170,18 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 
 **业务行为：** 按 `business-rules.md` 第 5-11 节实现全部业务行为，包括但不限于：
 - 语言与国际化（`project.language`、`project.languageSwitch`）
-- 转化流程状态机（`flowMode`、前置需求单元、联系方式、验证码、预约）
+- 转化流程状态机（严格按照 `conversionFlow` 的阶段顺序和节点顺序）
 - 字段体系（通用字段、科目条件字段、联系方式模式、数据归属与复用）
 - 结果页（双模式：`booking=false` 简洁祝贺页 / `booking=true` 预约总览页）
-- 购票式多娃多科循环（选科目 → 选孩子 → 资料补充与预约/报名 → 返回结果页）
+- 购票式多娃多科循环（选科目 → 选孩子 → 按 conversionFlow 完成 → 返回结果页）
 - 隐私同意、校验、提交、成功、失败和重试状态
 - 真实性边界：不虚构师资、评价、成绩、排名、奖项、价格、优惠、学员数量、合作品牌、资质或预约库存
 
 以下为编码层面特有的补充要求：
-- 验证码容器使用 `data-verification-stage` 属性标记其阶段
+- 验证码容器使用 `data-verification-stage` 属性标记其阶段（与 `verification` 节点所在阶段一致）
 - 没有真实时段数据时，使用明确标注的原型数据（如注释或 placeholder 标记 "prototype"），不伪装成真实库存
 - 隐藏字段、未启用功能和未选择分支的数据不进入提交结果
+- `conversionFlow` 中各阶段和节点的顺序必须与配置完全一致
 
 #### CTA 行为与真实性
 
@@ -162,12 +198,11 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 
 - 装饰性元素（图标、背景图形、装饰性插画）优先使用内联 SVG，确保单文件自包含和无限缩放
 - 照片级素材（场景图、人物图、教学环境）使用免费 CDN 图库直链（如 Unsplash、Pexels），确保视觉品质和真实感
-- 不使用本地文件路径，不依赖外部构建工具或文件系统
 - 图片必须添加明确的尺寸约束，避免布局抖动
 
 ### 第 7 步：自检
 
-生成代码后，在交付前对照以下清单自检：
+生成代码后，在交付前对照以下清单自检:
 
 **业务正确性**
 
@@ -205,6 +240,7 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 ## 决策原则
 
 - 把 `user_config_info.json` 视为唯一项目事实；不生成、不校验、不修复
+- `conversionFlow` 是转化流程的唯一事实来源，严格遵循其两层数组顺序
 - 不添加未配置的字段、科目和功能
 - 不虚构效果、数据、评价、师资、价格、优惠、合作品牌或预约库存
 - 缺少事实型内容时优先省略；编辑态占位必须明确标注
@@ -222,5 +258,6 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 | JSON 解析失败 | 指出错误位置，不猜测修复 |
 | 配置与业务规则存在真实冲突 | 指出具体字段和规则，请用户确认 |
 | 配置缺失可选字段 | 按 `user-config-spec.md` 的默认值理解，不补全到配置中 |
+| `conversionFlow` 中出现未知 kind 或无效节点 | 指出具体节点，不静默跳过 |
 | 需要真实数据但没有（如预约时段） | 使用明确标注的原型数据，不伪装真实 |
 | 用户要求与配置冲突 | 按"有效配置 → 业务不变量 → 用户明确要求"优先级处理，并向用户说明 |

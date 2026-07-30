@@ -1,0 +1,97 @@
+{
+  "version": "2.0",
+  "description": "标准题库表。按 questionId 索引，支持中英双语。questionText/text 为中文默认文案，questionTextEn/textEn 为英文文案。AI 生成落地页时根据 project.language 选择对应语言。",
+  "questions": [
+    {
+      "questionId": "zh_goal_001",
+      "subject": "中文",
+      "category": "学习期望",
+      "type": "multi_select",
+      "questionText": "在孩子的国际中文学习方面，您有什么期望吗？（可多选）",
+      "questionTextEn": "What are your expectations regarding your child's Chinese Language learning?",
+      "options": [
+        { "optionId": "zh_goal_001_opt_1", "text": "开拓升学/职业前景", "textEn": "Boost academic/career prospects" },
+        { "optionId": "zh_goal_001_opt_2", "text": "了解中华文化", "textEn": "Gain insights into Chinese culture" },
+        { "optionId": "zh_goal_001_opt_3", "text": "培养兴趣爱好", "textEn": "Cultivate interests and hobbies" },
+        { "optionId": "zh_goal_001_opt_4", "text": "熟练与他人交流", "textEn": "Communicate with family and friends" },
+        { "optionId": "zh_goal_001_opt_5", "text": "听、读、写", "textEn": "Enhance listening, reading, and writing skills" },
+        { "optionId": "zh_goal_001_opt_6", "text": "备考HSK/YCT/IB/A-level", "textEn": "Prepare for HSK/YCT/IB/A-level Test" }
+      ]
+    },
+    {
+      "questionId": "zh_level_001",
+      "subject": "中文",
+      "category": "学习经验",
+      "type": "single_select",
+      "questionText": "孩子之前有中文学习经验吗？",
+      "questionTextEn": "Any prior Chinese learning experience for your child?",
+      "questionTextNote": "信息仅用于为孩子匹配个性化老师和课程。",
+      "questionTextNoteEn": "Information is only used to match personalized teachers and courses for the child.",
+      "options": [
+        { "optionId": "zh_level_001_opt_1", "text": "无中文学习经验", "textEn": "No background" },
+        { "optionId": "zh_level_001_opt_2", "text": "没学过，但能进行日常交流", "textEn": "Can talk about simple topics" },
+        { "optionId": "zh_level_001_opt_3", "text": "<1 年学习经验", "textEn": "<1 year of study" },
+        { "optionId": "zh_level_001_opt_4", "text": "1-2 年学习经验", "textEn": "1-2 years of study" },
+        { "optionId": "zh_level_001_opt_5", "text": "2+ 年学习经验", "textEn": ">2 years of study" },
+        { "optionId": "zh_level_001_opt_6", "text": "母语是中文", "textEn": "Native speaker" }
+      ]
+    },
+    {
+      "questionId": "math_goal_001",
+      "subject": "数学",
+      "category": "学习期望",
+      "type": "multi_select",
+      "questionText": "在孩子的国际数学学习方面，您有什么期望吗？（可多选）",
+      "questionTextEn": "What are your expectations regarding your child's Mathematics learning?",
+      "options": [
+        { "optionId": "math_goal_001_opt_1", "text": "提升数学成绩", "textEn": "Improve math grades" },
+        { "optionId": "math_goal_001_opt_2", "text": "参加AMC 8/袋鼠竞赛等数学竞赛", "textEn": "Join AMC 8, Math Kangaroo, and other math contests" },
+        { "optionId": "math_goal_001_opt_3", "text": "提升和培养逻辑思维能力", "textEn": "Develop logical thinking skills" },
+        { "optionId": "math_goal_001_opt_4", "text": "培养数学学习兴趣", "textEn": "Cultivate an interest in math" }
+      ]
+    },
+    {
+      "questionId": "math_difficulty_001",
+      "subject": "数学",
+      "category": "学习困难",
+      "type": "multi_select",
+      "questionText": "在学习国际数学时，孩子主要面临哪些困难？（可多选）",
+      "questionTextEn": "What are the main challenges your child faces when learning Mathematics?",
+      "options": [
+        { "optionId": "math_difficulty_001_opt_1", "text": "运算能力不足", "textEn": "Lacking computational skills" },
+        { "optionId": "math_difficulty_001_opt_2", "text": "缺少解题技巧", "textEn": "Struggling with problem solving" },
+        { "optionId": "math_difficulty_001_opt_3", "text": "缺乏国际数学思维", "textEn": "Missing international math concepts" },
+        { "optionId": "math_difficulty_001_opt_4", "text": "缺失对数学的兴趣", "textEn": "Lack of interest in mathematics" }
+      ]
+    },
+    {
+      "questionId": "en_goal_001",
+      "subject": "英文",
+      "category": "学习期望",
+      "type": "multi_select",
+      "questionText": "在孩子的英文阅读写作学习方面，您有什么期望吗？（可多选）",
+      "questionTextEn": "What are your expectations regarding your child's English Language Arts learning? (Multiple choice)",
+      "options": [
+        { "optionId": "en_goal_001_opt_1", "text": "提高校内成绩", "textEn": "Improve academic performance" },
+        { "optionId": "en_goal_001_opt_2", "text": "提高写作水平", "textEn": "Enhance writing proficiency" },
+        { "optionId": "en_goal_001_opt_3", "text": "提高阅读水平", "textEn": "Elevate reading skills" },
+        { "optionId": "en_goal_001_opt_4", "text": "提升表达能力", "textEn": "Boost expressive abilities" }
+      ]
+    },
+    {
+      "questionId": "en_difficulty_001",
+      "subject": "英文",
+      "category": "学习困难",
+      "type": "multi_select",
+      "questionText": "在学习英文阅读写作时，孩子主要面临哪些困难？（可多选）",
+      "questionTextEn": "What are the main challenges your child faces when learning English Language Arts? (Multiple choice)",
+      "options": [
+        { "optionId": "en_difficulty_001_opt_1", "text": "词汇量不足", "textEn": "Limited vocabulary" },
+        { "optionId": "en_difficulty_001_opt_2", "text": "语法总是错", "textEn": "Frequent grammar errors" },
+        { "optionId": "en_difficulty_001_opt_3", "text": "阅读理解有难度", "textEn": "Reading comprehension difficulties" },
+        { "optionId": "en_difficulty_001_opt_4", "text": "缺少合适的学习方法", "textEn": "Lack of effective study methods" },
+        { "optionId": "en_difficulty_001_opt_5", "text": "写作很困难/组织语言没思路", "textEn": "Difficulty in writing, struggles in organizing ideas" }
+      ]
+    }
+  ]
+}
