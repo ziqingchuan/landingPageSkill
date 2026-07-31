@@ -270,7 +270,7 @@ AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
       "pc",
       "mobile"
     ],
-    "contactMode": "phone",
+    "contactMode": "either",
     "flowMode": "lead_first",
     "booking": true,
     "multiChild": true,
@@ -309,7 +309,12 @@ AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
         {
           "kind": "field",
           "key": "phone",
-          "required": true
+          "required": false
+        },
+        {
+          "kind": "field",
+          "key": "email",
+          "required": false
         },
         {
           "kind": "verification"
@@ -354,6 +359,7 @@ AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
 > 示例说明：
 > - 使用 `conversionFlow` 统一描述转化流程。
 > - 进线科目为中文，`lead` 阶段依次展示：年龄 → 学习期望问题 → 中文水平。
+> - contactMode=either，因此 contact 阶段同时配置 phone 和 email，两个字段均为 required=false；页面执行“手机号或邮箱至少填写一个”的组合校验。
 > - `contact` 阶段依次展示：手机号 → 验证码 → 沟通语言。
 > - `booking` 阶段依次展示：孩子称呼 → 时区/国家 → 预约时段选择。
 > - `complete` 阶段：配置了 `calendarSync`（日历同步）；提交和结果展示是该阶段的固有行为，无需配置。
