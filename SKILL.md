@@ -19,15 +19,16 @@ description: Reads a user-uploaded user_config_info.json plus three reference ma
 | `references/user-config-spec.md` | 字段说明书：解释 JSON 每个字段含义、类型、允许值、默认值 | 必需（已内置） |
 | `references/business-rules.md` | 业务护栏：定义字段、转化、预约、多娃多科等行为不变量 | 必需（已内置） |
 | `references/frontend-design.md` | 视觉方向指南：题材取材、字体、布局、视觉母题、反模板判断 | 必需（已内置） |
+| `references/engineering-conventions.md` | 工程约定：CJK 适配、命名隔离、作用域防护、初始加载正确性 | 必需（已内置） |
 | `references/question-bank.json` | 标准题库表：题目正文、选项、科目和分类映射 | 必需（已内置） |
 
-三个 `.md` 文件和 `question-bank.json` 位于 Skill 同级 `references/` 目录，已随项目内置。用户只需提供 `user_config_info.json`（以文件、代码块或 JSON 字符串形式皆可）。
+四个 `.md` 文件和 `question-bank.json` 位于 Skill 同级 `references/` 目录，已随项目内置。用户只需提供 `user_config_info.json`（以文件、代码块或 JSON 字符串形式皆可）。
 
 ## 优先级
 
 当来源冲突时，按以下顺序处理：
 
-**有效配置 → 业务不变量 → 用户明确要求 → Frontend Design 审美方向**
+**有效配置 → 业务不变量 → 用户明确要求 → 工程约定 → Frontend Design 审美方向**
 
 - 业务规则是护栏，不是页面模板
 - 设计风格可以自由变化，但不得改变业务含义、必填规则、开关结果与数据归属
@@ -156,6 +157,13 @@ AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
 
 ### 第 6 步：生成页面代码
 
+在写代码前，先读取 `references/engineering-conventions.md`，理解当前配置会触发的工程约束：
+
+- 若目标语言含 CJK 字符，注意 `ch` 单位禁用规则，改用 `em`/`rem`/`%`。
+- 确认 `data-*` 属性、全局变量和 ID 选择器按命名隔离规则加 `lp-` 前缀。
+- 确认初始加载正确性：i18n、默认值、首屏元素在 `DOMContentLoaded` 后即正确，不依赖首次交互。
+- 这些约束是代码质量护栏，不得改变业务结果；当审美方向与工程约束冲突时，按优先级链处理。
+
 直接输出完整的、可直接在浏览器打开运行的单文件 HTML：
 
 - `<html>` + `<head>`（含 meta、title、字体引入、内联 `<style>`）+ `<body>` + 内联 `<script>`
@@ -217,6 +225,15 @@ AI 必须严格按照这两层顺序生成页面流程，不得自行调整。
 - 键盘焦点可见
 - `prefers-reduced-motion` 被尊重
 - CSS 选择器特异性没有互相抵消
+
+**工程稳定性**
+
+对照 `references/engineering-conventions.md` 第 6 节「工程自检清单」逐项确认：
+
+- **CJK 单位**：目标语言含 CJK 字符时，未使用 `ch` 单位限制文本宽度（标题、截断容器、段落宽度均已替换为 `em`/`rem`/`%`）。
+- **命名前缀**：页面自有的 `data-*` 属性使用 `lp-` 前缀（如 `data-lp-t`、`data-lp-step`），未使用高风险通用名（`data-i18n`、`data-key`、`data-state`）；业务规则要求保留的属性名（如 `data-verification-stage`）未被替换。
+- **作用域隔离**：所有 JS 包裹在 IIFE 或命名空间内，暴露到全局的变量使用 `window.LP` 等带前缀命名空间；未使用裸 `id` 选择器作为脚本或样式锚点。
+- **初始加载正确性**：i18n 文案在 `DOMContentLoaded` 后立即应用，不依赖首次交互；默认值、初始视图、首屏可见元素在首次渲染时即正确。
 
 **代码可运行性**
 
